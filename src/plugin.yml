@@ -1,0 +1,43 @@
+name: Hardcore-Lives
+version: 1.0
+api-version: 1.16
+author: i54m
+website: https://i54m.com
+description: Gives players lives on a hardocre server.
+main: com.i54m.hardcorelives.Main
+softdepend: [PlaceholderAPI]
+
+commands:
+  addlives:
+    description: adds lives to a player.
+  giftlives:
+    description: allows alive players to give excess lives to dead players.
+  hardcorelivesreload:
+    description: reloads the configuration file.
+  purchaselives:
+    description: like add lives but changes the message to thank them for purchasing the lives - made for stores.
+  removelives:
+    description: removes lives from a player.
+  setlives:
+    description: sets a players lives to the amount specified.
+
+
+permissions:
+  hardcorelives.bypassreset:
+    description: allows the user to bypass everything being reset when they die.
+    default: op
+  hardcorelives.bypassteleport:
+    description: allows the user to bypass the teleport block when they are dead.
+    default: op
+  hardcorelives.addlives:
+    description: allows the user to use the addlives command.
+    default: op
+  hardcorelives.purchaselives:
+    description: allows the user to use the purchaselives command.
+    default: op
+  hardcorelives.removelives:
+    description: allows the user to use the removelives command.
+    default: op
+  hardcorelives.setlives:
+    description: allows the user to use the setlives command.
+    default: op

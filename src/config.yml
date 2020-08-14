@@ -1,0 +1,23 @@
+default-lives: 2
+
+death-respawn:
+  world: "world"
+  x: 0.0
+  y: 60.0
+  z: 0.0
+  pitch: 0.0
+  yaw: 0.0
+
+death-particle-amount: 25
+respawn-particle-amount: 25
+
+respawn-max-distance: 30000
+
+life-item:
+  Material: "CONDUIT"
+  Name: "&6Life Orb"
+  Lore:
+    - "&fRight click to redeem a life!"
+    - "&fuse this to gain an extra life!"
+  Enchanted: true
+  Craftable: true
