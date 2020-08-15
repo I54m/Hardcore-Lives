@@ -46,7 +46,7 @@ public class RemoveLives implements CommandExecutor {
                         commandSender.sendMessage(ChatColor.RED + strings[1] + " is not a valid number of lives to remove!");
                         return false;
                     }
-                    targetData.set("lives", lives);
+                    targetData.set("lives", Math.max(lives, 0));
                     playerDataManager.savePlayerData(target.getUniqueId());
                     commandSender.sendMessage(ChatColor.GREEN + "Removed " + strings[1] + " lives from " + target.getName());
                     target.sendMessage(ChatColor.RED + strings[1] + " lives have been removed from you!");
@@ -84,7 +84,7 @@ public class RemoveLives implements CommandExecutor {
                         commandSender.sendMessage(ChatColor.RED + strings[1] + " is not a valid number of lives to remove!");
                         return false;
                     }
-                    targetData.set("lives", lives);
+                    targetData.set("lives", Math.max(lives, 0));
                     playerDataManager.savePlayerData(uuid);
                     commandSender.sendMessage(ChatColor.GREEN + "Removed " + strings[1] + " lives from " + name);
                     return true;

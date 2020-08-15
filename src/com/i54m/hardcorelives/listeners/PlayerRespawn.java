@@ -63,7 +63,7 @@ public class PlayerRespawn implements Listener {
         }
         player.sendMessage(ChatColor.RED + "You have died: " + deaths + " times. You should be more careful!");
         config.set("deaths", deaths);
-        config.set("lives", lives);
+        config.set("lives", Math.max(lives, 0));
         playerDataManager.savePlayerData(player.getUniqueId());
     }
 }

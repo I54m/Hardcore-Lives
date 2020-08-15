@@ -46,7 +46,7 @@ public class SetLives implements CommandExecutor {
                         commandSender.sendMessage(ChatColor.RED + strings[1] + " is not a valid number of lives to set!");
                         return false;
                     }
-                    targetData.set("lives", lives);
+                    targetData.set("lives", Math.max(lives, 0));
                     playerDataManager.savePlayerData(target.getUniqueId());
                     commandSender.sendMessage(ChatColor.GREEN + "Set " + target.getName() + "'s lives to: " + strings[1]);
                     target.sendMessage(ChatColor.RED + "your lives have been set to: " + strings[1] + "!");
@@ -83,7 +83,7 @@ public class SetLives implements CommandExecutor {
                         commandSender.sendMessage(ChatColor.RED + strings[1] + " is not a valid number of lives to set!");
                         return false;
                     }
-                    targetData.set("lives", lives);
+                    targetData.set("lives", Math.max(lives, 0));
                     playerDataManager.savePlayerData(uuid);
                     commandSender.sendMessage(ChatColor.GREEN + "Set " + name + "'s lives to: " + strings[1]);
                     return true;
