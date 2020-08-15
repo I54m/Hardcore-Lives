@@ -53,8 +53,6 @@ public class PlayerRespawn implements Listener {
             player.sendMessage(ChatColor.RED + "You now have: " + lives + " lives left. Use them wisely!");
             player.setInvulnerable(true);
             player.sendMessage(ChatColor.GREEN + "You are invincible for the next 10 seconds!");
-            player.getInventory().addItem(plugin.getBook());
-            player.updateInventory();
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 if (player.isOnline()) {
                     player.setInvulnerable(false);
