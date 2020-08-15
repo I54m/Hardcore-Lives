@@ -20,6 +20,10 @@ commands:
     description: removes lives from a player.
   setlives:
     description: sets a players lives to the amount specified.
+  giftlifeorb:
+    description: gifts a player a life item.
+  resetdeaths:
+    description: resets the deaths of a player.
 
 
 permissions:
