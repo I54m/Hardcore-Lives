@@ -38,7 +38,7 @@ public class PlayerInteract implements Listener {
                 player.getInventory().setItemInOffHand(usedItem);
             player.updateInventory();
             FileConfiguration playerData = playerDataManager.getPlayerData(player.getUniqueId(), false);
-            int currentLives = playerData.getInt("lives");
+            int currentLives = Math.max(playerData.getInt("lives"), 0);
             currentLives++;
             playerData.set("lives", currentLives);
             playerDataManager.savePlayerData(player.getUniqueId());

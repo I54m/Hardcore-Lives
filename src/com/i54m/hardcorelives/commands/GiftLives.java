@@ -37,8 +37,8 @@ public class GiftLives implements CommandExecutor {
                         player.sendMessage(ChatColor.RED + "You may only gift lives to dead players!");
                         return true;
                     }
-                    int playerLives = playerData.getInt("lives");
-                    int targetLives = targetData.getInt("lives");
+                    int playerLives = Math.max(playerData.getInt("lives"), 0);
+                    int targetLives = Math.max(targetData.getInt("lives"), 0);
                     if (playerLives <= 1) {
                         player.sendMessage(ChatColor.RED + "You only have one live left you cannot give someone your last live, you would die!");
                         return true;

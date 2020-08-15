@@ -39,7 +39,7 @@ public class PurchaseLives implements CommandExecutor {
                 final Player target = Bukkit.getPlayer(strings[0]);
                 if (target != null && target.isOnline()) {
                     final FileConfiguration targetData = playerDataManager.getPlayerData(target, false);
-                    int lives = targetData.getInt("lives");
+                    int lives = Math.max(targetData.getInt("lives"), 0);
                     try {
                         lives += Integer.parseInt(strings[1]);
                     } catch (NumberFormatException nfe) {
@@ -73,7 +73,7 @@ public class PurchaseLives implements CommandExecutor {
                     executorService.shutdown();
                     String name = NameFetcher.getName(uuid);
                     final FileConfiguration targetData = playerDataManager.getPlayerData(uuid, false);
-                    int lives = targetData.getInt("lives");
+                    int lives = Math.max(targetData.getInt("lives"), 0);
                     try {
                         lives += Integer.parseInt(strings[1]);
                     } catch (NumberFormatException nfe) {
