@@ -12,7 +12,7 @@ public class HardcoreLivesPlaceholder extends PlaceholderExpansion {
     @Override
     public String onPlaceholderRequest(Player p, String value) {
         if (value.equals("lives"))
-            return String.valueOf(playerDataManager.getPlayerData(p, false).getInt("lives"));
+            return String.valueOf(Math.max(playerDataManager.getPlayerData(p, false).getInt("lives"), 0));
         else if (value.equals("deaths"))
             return String.valueOf(playerDataManager.getPlayerData(p, false).getInt("deaths"));
         else
