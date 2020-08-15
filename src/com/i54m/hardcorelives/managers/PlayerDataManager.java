@@ -153,18 +153,12 @@ public class PlayerDataManager implements Listener, Manager {
      */
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerQuit(@NotNull final PlayerQuitEvent e) {
-        WorkerManager.getINSTANCE().runWorker(new WorkerManager.Worker(() -> {
-
-            playerDataCache.remove(e.getPlayer().getUniqueId());
-        }));
+        WorkerManager.getINSTANCE().runWorker(new WorkerManager.Worker(() -> playerDataCache.remove(e.getPlayer().getUniqueId())));
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerKick(@NotNull final PlayerKickEvent e) {
-        WorkerManager.getINSTANCE().runWorker(new WorkerManager.Worker(() -> {
-
-            playerDataCache.remove(e.getPlayer().getUniqueId());
-        }));
+        WorkerManager.getINSTANCE().runWorker(new WorkerManager.Worker(() -> playerDataCache.remove(e.getPlayer().getUniqueId())));
     }
 
     /**
