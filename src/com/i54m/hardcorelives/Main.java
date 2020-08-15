@@ -65,6 +65,8 @@ public class Main extends JavaPlugin {
         //register commands
         Bukkit.getPluginCommand("addlives").setExecutor(new AddLives());
         Bukkit.getPluginCommand("giftlives").setExecutor(new GiftLives());
+        Bukkit.getPluginCommand("giftlifeorb").setExecutor(new GiftLifeOrb());
+        Bukkit.getPluginCommand("resetdeaths").setExecutor(new ResetDeaths());
         Bukkit.getPluginCommand("hardcorelivesreload").setExecutor(new HardcoreLivesReload());
         Bukkit.getPluginCommand("purchaselives").setExecutor(new PurchaseLives());
         Bukkit.getPluginCommand("removelives").setExecutor(new RemoveLives());
@@ -156,8 +158,6 @@ public class Main extends JavaPlugin {
                 playerDataManager.savePlayerData(target.getUniqueId());
                 target.playSound(target.getLocation(), Sound.ITEM_TOTEM_USE, 1, 1);
                 target.spawnParticle(Particle.TOTEM, target.getLocation(), getRespawnParticleAmount());
-                target.getInventory().addItem(Book);
-                target.updateInventory();
                 target.setInvulnerable(true);
                 target.sendMessage(ChatColor.GREEN + "You are invincible for the next 10 seconds, use them wisely!");
                 Bukkit.getScheduler().runTaskLater(this, () -> {
