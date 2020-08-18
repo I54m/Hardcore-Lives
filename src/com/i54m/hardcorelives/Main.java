@@ -64,6 +64,7 @@ public class Main extends JavaPlugin {
         loadVariables();
         //register commands
         Bukkit.getPluginCommand("addlives").setExecutor(new AddLives());
+        Bukkit.getPluginCommand("convertlives").setExecutor(new ConvertLives());
         Bukkit.getPluginCommand("giftlives").setExecutor(new GiftLives());
         Bukkit.getPluginCommand("giftlifeorb").setExecutor(new GiftLifeOrb());
         Bukkit.getPluginCommand("resetdeaths").setExecutor(new ResetDeaths());
@@ -73,6 +74,7 @@ public class Main extends JavaPlugin {
         Bukkit.getPluginCommand("setlives").setExecutor(new SetLives());
         //register events
         Bukkit.getPluginManager().registerEvents(new BlockPlace(), this);
+        Bukkit.getPluginManager().registerEvents(new EntityDamage(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerDeath(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerInteract(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerRespawn(), this);
@@ -93,9 +95,14 @@ public class Main extends JavaPlugin {
     public void loadVariables() {
         try {
             DefaultLives = getConfig().getInt("default-lives", 2);
-            World world = getServer().getWorld(getConfig().getString("death-respawn.world", "world"));
+            String worldString = getConfig().getString("death-respawn.world");
+            if (worldString == null) {
+                getLogger().warning("Could not find " + worldString + " world! Using world \"world\" as death world!");
+                worldString = "world";
+            }
+            World world = getServer().getWorld(worldString);
             if (world == null) {
-                getLogger().warning("Could not find death world! using world 0 as death world!");
+                getLogger().warning("Could not find " + worldString + " world! Using world 0 as death world!");
                 world = getServer().getWorlds().get(0);
             }
             DeathRespawn = new Location(
@@ -145,6 +152,8 @@ public class Main extends JavaPlugin {
         Bukkit.getScheduler().runTaskLater(this, () -> {
             if (target.isOnline()) {
                 target.sendMessage(ChatColor.GREEN + "Respawning you now....");
+                targetData.set("alive", true);
+                playerDataManager.savePlayerData(target.getUniqueId());
                 if (target.getBedSpawnLocation() != null) {
                     //found bed/anchor to respawn you at
                     target.sendMessage(ChatColor.GREEN + "Found a bed/charged respawn anchor to respawn you at!");
@@ -154,18 +163,9 @@ public class Main extends JavaPlugin {
                     target.sendMessage(ChatColor.RED + "Could not find a bed/charged respawn anchor to respawn you at!");
                     target.teleport(getRandomLocation());
                 }
-                targetData.set("alive", true);
-                playerDataManager.savePlayerData(target.getUniqueId());
                 target.playSound(target.getLocation(), Sound.ITEM_TOTEM_USE, 1, 1);
                 target.spawnParticle(Particle.TOTEM, target.getLocation(), getRespawnParticleAmount());
-                target.setInvulnerable(true);
-                target.sendMessage(ChatColor.GREEN + "You are invincible for the next 10 seconds, use them wisely!");
-                Bukkit.getScheduler().runTaskLater(this, () -> {
-                    if (target.isOnline()) {
-                        target.setInvulnerable(false);
-                        target.sendMessage(ChatColor.RED + "You are no longer invincible, don't die!");
-                    }
-                }, 10 * 20);
+                EntityDamage.setInvincible(target, 10);
             }
         }, 5 * 20);
     }
@@ -202,7 +202,7 @@ public class Main extends JavaPlugin {
     }
 
     public Location getRandomLocationUnSafe() {
-        World world = getServer().getWorld("overworld");
+        World world = getServer().getWorld("world");
         if (world == null) world = getServer().getWorlds().get(0);
         Random rndGen = new Random();
         int r = rndGen.nextInt(maxDistance);
@@ -217,11 +217,13 @@ public class Main extends JavaPlugin {
     public boolean isSafeLocation(Location location) {
         Block feet = location.getBlock();
         if (feet.getType().isSolid() && feet.getLocation().add(0, 1, 0).getBlock().getType().isSolid())
-            return false; // solid feet space (will suffocate)
+            return false; // solid feet space (not ideal location and potential to suffocate)
         Block head = feet.getRelative(BlockFace.UP);
         if (head.getType().isSolid()) return false; // solid head space (will suffocate)
         Block ground = feet.getRelative(BlockFace.DOWN);
-        if (!ground.getType().isSolid()) return false; // ground not solid
+        if (!ground.getType().isSolid()) return false; // ground not solid (will fall)
+
+        if (ground.getBiome().name().contains("OCEAN")) return new Random().nextBoolean(); // 50% chance to allow ocean locations if location is an ocean
 
         return head.getType() != Material.LAVA &&
                 feet.getType() != Material.LAVA; // make sure the air gaps aren't lava
@@ -229,11 +231,9 @@ public class Main extends JavaPlugin {
 }
 /*
 placeholder for amount of lives left
-lives - on buycraft can be crafted from soul gems + nether star + diamonds - /giftlives, /addlives, /setlives /removelives
-soul gems dropped from killing a player
+lives - on buycraft can be crafted from soul gems + nether star + netherite ingot - /giftlives, /addlives, /setlives /removelives
 respawn - they just lose inv and exp and respawn at bed/random & reset advancements
 start at 2 lives
 first spawn = random spawn
 claiming
-1.8 combat?
  */
