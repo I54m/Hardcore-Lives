@@ -44,6 +44,9 @@ public class PlayerInteract implements Listener {
             playerDataManager.savePlayerData(player.getUniqueId());
             String lifeItemName = ChatColor.translateAlternateColorCodes('&', plugin.getLifeItem().getItemMeta().getDisplayName());
             player.sendMessage(ChatColor.GREEN + "You claimed a " + lifeItemName + ChatColor.GREEN + ". You now have: " + currentLives + " lives remaining!");
+            if (currentLives > 0 && !playerData.getBoolean("alive")) {
+                plugin.respawn(player, playerData);
+            }
         }
     }
 }
