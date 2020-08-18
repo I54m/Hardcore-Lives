@@ -2,12 +2,12 @@ package com.i54m.hardcorelives.managers;
 
 import com.i54m.hardcorelives.Main;
 import com.i54m.hardcorelives.exceptions.ManagerNotStartedException;
+import com.i54m.hardcorelives.listeners.EntityDamage;
 import com.sun.istack.internal.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -120,19 +120,13 @@ public class PlayerDataManager implements Listener, Manager {
                         }
                     }
                 }
-                player.setInvulnerable(true);
-                player.sendMessage(ChatColor.RED + "You have 5 seconds of invincibility! Use them Wisely!");
+                EntityDamage.setInvincible(player, 10);
+            } else if (!playerData.getBoolean("alive") && playerData.getInt("lives") > 0) {
                 try {
                     Thread.sleep(5000);
                 } catch (InterruptedException interruptedException) {
                     interruptedException.printStackTrace();
                 }
-                if (player.isOnline()) {
-                    player.setInvulnerable(false);
-                    player.sendMessage(org.bukkit.ChatColor.RED + "You are no longer invincible, don't die!");
-                    player.playEffect(player.getLocation(), Effect.MOBSPAWNER_FLAMES, null);
-                }
-            } else if (!playerData.getBoolean("alive") && playerData.getInt("lives") > 0) {
                 player.sendMessage(ChatColor.GREEN + "It seems you are dead and have an extra life!");
                 Bukkit.getScheduler().callSyncMethod(PLUGIN, () -> {
                     PLUGIN.respawn(player, playerData);
