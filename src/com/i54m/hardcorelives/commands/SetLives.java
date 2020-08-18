@@ -74,6 +74,10 @@ public class SetLives implements CommandExecutor {
                         return false;
                     }
                     executorService.shutdown();
+                    if (uuid == null) {
+                        commandSender.sendMessage(ChatColor.RED + strings[0] + " is not a player's name!");
+                        return true;
+                    }
                     String name = NameFetcher.getName(uuid);
                     final FileConfiguration targetData = playerDataManager.getPlayerData(uuid, false);
                     int lives;
