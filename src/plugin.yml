@@ -5,7 +5,9 @@ author: i54m
 website: https://i54m.com
 description: Gives players lives on a hardocre server.
 main: com.i54m.hardcorelives.Main
-softdepend: [PlaceholderAPI]
+softdepend:
+  - PlaceholderAPI
+  - Multiverse-Core #added due to issues getting the death world
 
 commands:
   addlives:
@@ -24,6 +26,8 @@ commands:
     description: gifts a player a life item.
   resetdeaths:
     description: resets the deaths of a player.
+  convertlives:
+    description: converts a players lives into item form.
 
 
 permissions:
@@ -44,4 +48,10 @@ permissions:
     default: op
   hardcorelives.setlives:
     description: allows the user to use the setlives command.
+    default: op
+  hardcorelives.giftlifeorb:
+    description: allows the user to use the giftlifeorb command.
+    default: op
+  hardcorelives.resetdeaths:
+    description: allows the user to use the resetdeaths command.
     default: op
