@@ -16,9 +16,8 @@ import java.util.HashMap;
 
 public class PlayerDeath implements Listener {
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerDeath(PlayerDeathEvent event) {
-        event.setKeepInventory(true);
         Player player = event.getEntity();
         player.spawnParticle(Particle.PORTAL, player.getLocation(), Main.getInstance().getDeathParticleAmount(), 0.5, 0.5, 0.5);
         player.playSound(player.getLocation(), Sound.ENTITY_WITHER_DEATH, 1, 1);
@@ -28,11 +27,17 @@ public class PlayerDeath implements Listener {
         int lives = playerDataManager.getPlayerData(player, false).getInt("lives");
         if (player.getInventory().contains(lifeItem) && lives <= 0) {
             HashMap<Integer, ? extends ItemStack> lifeItems = player.getInventory().all(lifeItem);
-            lives = lives+lifeItems.values().size();
+            lives += lifeItems.values().size();
             playerDataManager.getPlayerData(player, false).set("lives", lives);
             player.sendMessage(ChatColor.GREEN + "Your inventory contained life orbs, they were automatically redeemed for you on death due to your low amount of lives!");
             playerDataManager.savePlayerData(player.getUniqueId());
         }
+        int x = player.getLocation().getBlockX();
+        int y = player.getLocation().getBlockY();
+        int z = player.getLocation().getBlockZ();
+        player.sendMessage(" ");
+        player.sendMessage(ChatColor.GREEN + "You died at x: " + x + " y: " + y + " z: " + z + "!");
+        player.sendMessage(" ");
     }
 
 }
