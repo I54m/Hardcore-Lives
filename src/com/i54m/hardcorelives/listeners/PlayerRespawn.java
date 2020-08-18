@@ -51,15 +51,7 @@ public class PlayerRespawn implements Listener {
             player.playSound(event.getRespawnLocation(), Sound.ITEM_TOTEM_USE, 1, 1);
             player.spawnParticle(Particle.TOTEM, event.getRespawnLocation(), plugin.getRespawnParticleAmount());
             player.sendMessage(ChatColor.RED + "You now have: " + lives + " lives left. Use them wisely!");
-            player.setInvulnerable(true);
-            player.sendMessage(ChatColor.GREEN + "You are invincible for the next 10 seconds!");
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                if (player.isOnline()) {
-                    player.setInvulnerable(false);
-                    player.sendMessage(ChatColor.RED + "You are no longer invincible. Don't die!");
-                    player.playEffect(player.getLocation(), Effect.MOBSPAWNER_FLAMES, null);
-                }
-            }, 10*20);
+            EntityDamage.setInvincible(player, 10);
         }
         player.sendMessage(ChatColor.RED + "You have died: " + deaths + " times. You should be more careful!");
         config.set("deaths", deaths);
