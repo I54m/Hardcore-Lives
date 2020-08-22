@@ -183,7 +183,8 @@ public class Main extends JavaPlugin {
 
     public Location getRandomLocation() {
         Location location = getRandomLocationUnSafe();
-        if (!isSafeLocation(location)) {
+
+        if (!isSafeLocationRespawn(location)) {
             double x = location.getBlockX() + 0.5;
             double z = location.getBlockZ() + 0.5;
             for (double y = location.getBlockY(); y > 0; y--) {
@@ -221,12 +222,18 @@ public class Main extends JavaPlugin {
         Block head = feet.getRelative(BlockFace.UP);
         if (head.getType().isSolid()) return false; // solid head space (will suffocate)
         Block ground = feet.getRelative(BlockFace.DOWN);
-        if (!ground.getType().isSolid()) return false; // ground not solid (will fall)
-
-        if (ground.getBiome().name().contains("OCEAN")) return new Random().nextBoolean(); // 50% chance to allow ocean locations if location is an ocean
+        if (!ground.getType().isSolid() || !ground.isLiquid()) return false; // ground not solid (will fall)
 
         return head.getType() != Material.LAVA &&
                 feet.getType() != Material.LAVA; // make sure the air gaps aren't lava
+    }
+
+    public boolean isSafeLocationRespawn(Location location) {
+        if (isSafeLocation(location))
+            if (location.getBlock().getRelative(BlockFace.DOWN).getBiome().name().contains("OCEAN"))
+                return new Random().nextBoolean(); // 50% chance to allow ocean locations if location is an ocean
+            else return true;
+        else return false;
     }
 }
 /*
