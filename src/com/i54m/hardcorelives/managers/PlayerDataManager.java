@@ -31,7 +31,6 @@ import java.util.UUID;
 @SuppressWarnings("ResultOfMethodCallIgnored")
 @NoArgsConstructor
 public class PlayerDataManager implements Listener, Manager {
-    private Main PLUGIN = Main.getInstance();
     /**
      * Private manager instance with a getter method.
      */
@@ -41,7 +40,7 @@ public class PlayerDataManager implements Listener, Manager {
      * Cache to keep all loaded player data configuration files.
      */
     private final Map<UUID, FileConfiguration> playerDataCache = new HashMap<>();
-
+    private Main PLUGIN = Main.getInstance();
     /**
      * Whether the manager is started or not,
      * true if the manager should be locked and no operations allowed, else false.
@@ -147,12 +146,28 @@ public class PlayerDataManager implements Listener, Manager {
      */
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerQuit(@NotNull final PlayerQuitEvent e) {
-        WorkerManager.getINSTANCE().runWorker(new WorkerManager.Worker(() -> playerDataCache.remove(e.getPlayer().getUniqueId())));
+        WorkerManager.getINSTANCE().runWorker(new WorkerManager.Worker(() -> {
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException interruptedException) {
+                interruptedException.printStackTrace();
+            }
+            if (!e.getPlayer().isOnline())
+                playerDataCache.remove(e.getPlayer().getUniqueId());
+        }));
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerKick(@NotNull final PlayerKickEvent e) {
-        WorkerManager.getINSTANCE().runWorker(new WorkerManager.Worker(() -> playerDataCache.remove(e.getPlayer().getUniqueId())));
+        WorkerManager.getINSTANCE().runWorker(new WorkerManager.Worker(() -> {
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException interruptedException) {
+                interruptedException.printStackTrace();
+            }
+            if (!e.getPlayer().isOnline())
+                playerDataCache.remove(e.getPlayer().getUniqueId());
+        }));
     }
 
     /**
