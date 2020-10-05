@@ -4,6 +4,7 @@ import com.i54m.hardcorelives.commands.*;
 import com.i54m.hardcorelives.listeners.*;
 import com.i54m.hardcorelives.managers.PlayerDataManager;
 import com.i54m.hardcorelives.managers.WorkerManager;
+import com.i54m.hardcorelives.utils.RandomLocation;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,6 +26,10 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 public class Main extends JavaPlugin {
 
@@ -45,7 +50,9 @@ public class Main extends JavaPlugin {
     private int RespawnParticleAmount;
     @Getter
     private ItemStack LifeItem;
+    @Getter
     private int maxDistance;
+    private ArrayList<Location> cachedSpawns = new ArrayList<>();
 
     @Override
     public void onLoad() {
@@ -62,6 +69,10 @@ public class Main extends JavaPlugin {
         saveDefaultConfig();
         reloadConfig();
         loadVariables();
+        //start managers and start caching spawn locations
+        workerManager.start();
+        playerDataManager.start();
+        cacheSpawnLocations();
         //register commands
         Bukkit.getPluginCommand("addlives").setExecutor(new AddLives());
         Bukkit.getPluginCommand("convertlives").setExecutor(new ConvertLives());
@@ -79,9 +90,6 @@ public class Main extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PlayerInteract(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerRespawn(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerTeleport(), this);
-
-        workerManager.start();
-        playerDataManager.start();
     }
 
     @Override
@@ -181,48 +189,49 @@ public class Main extends JavaPlugin {
         Bukkit.addRecipe(lifeItemRecipe);
     }
 
-    public Location getRandomLocation() {
-        Location location = getRandomLocationUnSafe();
-
-        if (!isSafeLocationRespawn(location)) {
-            double x = location.getBlockX() + 0.5;
-            double z = location.getBlockZ() + 0.5;
-            for (double y = location.getBlockY(); y > 0; y--) {
-                Location feet = new Location(location.getWorld(), x, y, z);
-                if (isSafeLocation(feet))
-                    return feet;
-            }
-            for (int x2 = location.getBlockX() - 10; x <= location.getBlockX() + 10; x++) {
-                for (int z2 = location.getBlockZ() - 10; z <= location.getBlockZ() + 10; z++) {
-                    Location feet = location.getWorld().getHighestBlockAt(x2, z2).getLocation();
-                    if (isSafeLocation(feet)) return feet;
+    private void cacheSpawnLocations() {
+        WorkerManager.getINSTANCE().runWorker(new WorkerManager.Worker(() -> {
+            for (int i = 0; i < 20; i++) {
+                cacheLocation();
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
-            return getRandomLocation();
-        } else return location;
+        }));
     }
 
-    public Location getRandomLocationUnSafe() {
-        World world = getServer().getWorld("world");
-        if (world == null) world = getServer().getWorlds().get(0);
-        Random rndGen = new Random();
-        int r = rndGen.nextInt(maxDistance);
-        int x = rndGen.nextInt(r);
-        int z = (int) Math.sqrt(Math.pow(r, 2) - Math.pow(x, 2));
-        if (rndGen.nextBoolean()) x *= -1;
-        if (rndGen.nextBoolean()) z *= -1;
-        Location randomLoc = new Location(world, x, 0, z);
-        return world.getHighestBlockAt(randomLoc).getLocation().add(0, 1, 0);
+    private void cacheLocation() {
+        Location location;
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Future<Location> future = executorService.submit(new RandomLocation());
+        try {
+            location = future.get(30, TimeUnit.SECONDS);
+            cachedSpawns.add(location);
+            getLogger().info("spawn location found and cached! total locations cached: " + cachedSpawns.size());
+        } catch (Exception e) {
+            getLogger().warning("unable to find a spawn location within 30s!");
+        }
+        executorService.shutdown();
+    }
+
+    public Location getRandomLocation() {
+        Location location = cachedSpawns.get(new Random().nextInt(cachedSpawns.size() - 1));
+        if (isSafeLocation(location)) return location; // check location is still safe if not remove it and cache a new one
+        else {
+            cachedSpawns.remove(location);
+            WorkerManager.getINSTANCE().runWorker(new WorkerManager.Worker(this::cacheLocation));
+            return getRandomLocation();
+        }
     }
 
     public boolean isSafeLocation(Location location) {
         Block feet = location.getBlock();
-        if (feet.getType().isSolid() && feet.getLocation().add(0, 1, 0).getBlock().getType().isSolid())
-            return false; // solid feet space (not ideal location and potential to suffocate)
         Block head = feet.getRelative(BlockFace.UP);
-        if (head.getType().isSolid()) return false; // solid head space (will suffocate)
+        if (!head.isEmpty() || !head.isPassable()) return false; // solid head space (will suffocate)
         Block ground = feet.getRelative(BlockFace.DOWN);
-        if (!ground.getType().isSolid() || !ground.isLiquid()) return false; // ground not solid (will fall)
+        if (ground.isEmpty() || ground.isPassable() || ground.isLiquid()) return false; // ground not solid (will fall)
 
         return head.getType() != Material.LAVA &&
                 feet.getType() != Material.LAVA; // make sure the air gaps aren't lava
