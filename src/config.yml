@@ -11,7 +11,7 @@ death-respawn:
 death-particle-amount: 25
 respawn-particle-amount: 25
 
-respawn-max-distance: 30000
+respawn-max-distance: 5000
 
 life-item:
   Material: "CONDUIT"
