@@ -43,7 +43,12 @@ public class PlayerRespawn implements Listener {
             if (!event.isAnchorSpawn() && !event.isBedSpawn()) {
                 //missing bed/anchor to respawn you at
                 player.sendMessage(ChatColor.RED + "Could not find a bed/charged respawn anchor to respawn you at!");
-                event.setRespawnLocation(plugin.getRandomLocation());
+                Location respawnLoc = plugin.getRandomLocation();
+                if (respawnLoc == null) {
+                    player.sendMessage(ChatColor.RED + "Could not find a valid location to respawn you at!");
+                } else {
+                    event.setRespawnLocation(respawnLoc);
+                }
             } else {
                 //found bed/anchor to respawn you at
                 player.sendMessage(ChatColor.GREEN + "Found a bed/charged respawn anchor to respawn you at!");
