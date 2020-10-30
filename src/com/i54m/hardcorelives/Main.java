@@ -191,7 +191,7 @@ public class Main extends JavaPlugin {
 
     private void cacheSpawnLocations() {
         WorkerManager.getINSTANCE().runWorker(new WorkerManager.Worker(() -> {
-            for (int i = 0; i < 20; i++) {
+            for (int i = 0; i < 5; i++) {
                 cacheLocation();
                 try {
                     Thread.sleep(1000);
