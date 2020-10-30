@@ -36,6 +36,7 @@ public class RandomLocation implements Callable<Location> {
                 if (plugin.isSafeLocation(feet))
                     return feet;
             }
+            Thread.sleep(500);
             //if downwards location check failed then check in a 20x20 radius for a safe location
             for (int x2 = location.getBlockX() - 10; x2 <= location.getBlockX() + 10; x2++) {
                 for (int z2 = location.getBlockZ() - 10; z2 <= location.getBlockZ() + 10; z2++) {
